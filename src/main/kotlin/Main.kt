@@ -7,8 +7,8 @@ fun main() {
     try {
         val searchResult = WikipediaSearch(userSearch)
 
-        searchResult.wikipediaResults.forEach {
-            println(it)
+        searchResult.wikipediaResults.forEachIndexed { index, item ->
+            println("$index) $item")
         }
 
         println("Choose page ID to open")

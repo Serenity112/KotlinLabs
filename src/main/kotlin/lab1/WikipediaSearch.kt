@@ -14,8 +14,9 @@ class WikipediaSearch(var requestString: String) {
     var wikipediaResults: List<WikipediaPage> = emptyList()
 
     init {
-        requestString = URLEncoder.encode(requestString, "UTF-8")
-        val jsonResponse = URL(requestLink + "\"$requestString\"").readText();
+        requestString = processInput(requestString)
+
+        val jsonResponse = getJsonResponse(requestString)
 
         wikipediaResults = getResults(jsonResponse)
 
@@ -24,8 +25,16 @@ class WikipediaSearch(var requestString: String) {
         }
     }
 
+    private fun processInput(input: String): String {
+        return URLEncoder.encode(input, "UTF-8")
+    }
+
+    private fun getJsonResponse(requestString: String): String {
+        return URL(requestLink + "\"$requestString\"").readText()
+    }
+
     private fun getResults(jsonString: String): List<WikipediaPage> {
-        var newResults: MutableList<WikipediaPage> = mutableListOf()
+        val newResults: MutableList<WikipediaPage> = mutableListOf()
 
         val jsonArray = Gson()
             .fromJson(jsonString, JsonObject::class.java)
@@ -33,7 +42,9 @@ class WikipediaSearch(var requestString: String) {
             .getAsJsonArray("search")
 
         jsonArray.forEach {
-            newResults.add(WikipediaPage(it.asJsonObject.getAsJsonPrimitive("title").toString(), it.asJsonObject.getAsJsonPrimitive("pageid").toString() ))
+            newResults.add(WikipediaPage(
+                it.asJsonObject.getAsJsonPrimitive("title").toString(),
+                it.asJsonObject.getAsJsonPrimitive("pageid").toString()))
         }
 
         return newResults
